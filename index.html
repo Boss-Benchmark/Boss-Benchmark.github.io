@@ -3,23 +3,21 @@
 
 <head>
   <meta charset="utf-8">
-  <title>BOSS: Benchmark for Observation Space Shift in Long-Horizon Task</title>
-  <meta name="description" content="BOSS: Benchmark for Observation Space Shift in Long-Horizon Task">
-  <meta name="keywords" content="BOSS">
+  <title>BOSS: A Benchmark for Observation Space Shift in Long-Horizon Task</title>
+  <meta name="description" content="BOSS: A Benchmark for Observation Space Shift (OSS) in long-horizon robot manipulation tasks. IEEE RA-L 2025 / ICRA 2026.">
+  <meta name="keywords" content="BOSS, Observation Space Shift, OSS, long-horizon, skill chaining, imitation learning, robot manipulation, LIBERO, OpenVLA">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta property="og:title" content="BOSS: Benchmark for Observation Space Shift in Long-Horizon Task">
+  <meta property="og:title" content="BOSS: A Benchmark for Observation Space Shift in Long-Horizon Task">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="BOSS: Benchmark for Observation Space Shift in Long-Horizon Task">
-  <meta property="og:image" content="https://https://boss-benchmark.github.io//static/images/teaser.png" />
+  <meta property="og:site_name" content="BOSS: A Benchmark for Observation Space Shift in Long-Horizon Task">
+  <meta property="og:image" content="https://boss-benchmark.github.io/static/images/illustration_OSM.png" />
   <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:width" content="1939" />
-  <meta property="og:image:height" content="772" />
-  <meta property="og:url" content="https://https://boss-benchmark.github.io//" />
-  <meta property="og:description" content="BOSS: Benchmark for Observation Space Shift in Long-Horizon Task" />
-  <meta name="twitter:title" content="BOSS: Benchmark for Observation Space Shift in Long-Horizon Task" />
-  <meta name="twitter:description" content="BOSS: Benchmark for Observation Space Shift in Long-Horizon Task" />
-  <meta name="twitter:image" content="https://https://boss-benchmark.github.io//static/images/teaser.png" />
-  
+  <meta property="og:url" content="https://boss-benchmark.github.io/" />
+  <meta property="og:description" content="We identify Observation Space Shift (OSS), a key failure mode when chaining pre-trained skills in long-horizon robot tasks, and introduce BOSS to study it." />
+  <meta name="twitter:title" content="BOSS: A Benchmark for Observation Space Shift in Long-Horizon Task" />
+  <meta name="twitter:description" content="We identify Observation Space Shift (OSS), a key failure mode when chaining pre-trained skills in long-horizon robot tasks, and introduce BOSS to study it." />
+  <meta name="twitter:image" content="https://boss-benchmark.github.io/static/images/illustration_OSM.png" />
+
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
 
   <link rel="stylesheet" href="./static/css/bulma.min.css">
@@ -28,50 +26,105 @@
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/icon.png">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script src="./static/js/bulma-carousel.min.js"></script>
   <script src="./static/js/bulma-slider.min.js"></script>
   <script src="./static/js/index.js"></script>
-  
+
+  <!-- MathJax for the OSS / POMDP definitions -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+
+  <style>
+    /* ---- BOSS page-specific styling (kept lightweight, on top of the Nerfies/Bulma template) ---- */
+    .navbar { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+    .navbar .navbar-item { font-family: 'Google Sans', sans-serif; font-weight: 600; }
+    .venue-badges { margin: 0.75rem 0 1.25rem 0; }
+    .venue-badges .tag { font-family: 'Google Sans', sans-serif; font-weight: 700; letter-spacing: 0.02em; }
+    .stat-band { background: #f5f7fa; border-radius: 12px; padding: 1.5rem 1rem; margin-top: 1.5rem; }
+    .stat-band .stat-number { font-family: 'Google Sans', sans-serif; font-size: 2.4rem; font-weight: 800; line-height: 1.1; }
+    .stat-band .stat-label { font-size: 0.95rem; color: #555; }
+    .stat-band .stat-rnn { color: #3a9679; }
+    .stat-band .stat-acc { color: #d9534f; }
+    .stat-band .stat-mit { color: #2d6a9f; }
+    .def-box { background: #f8f9fb; border-left: 5px solid #2d6a9f; border-radius: 6px; padding: 1.1rem 1.4rem; margin: 1.25rem 0; }
+    .def-box .def-title { font-family: 'Google Sans', sans-serif; font-weight: 700; color: #2d6a9f; margin-bottom: 0.4rem; }
+    .challenge-card { height: 100%; border-radius: 12px; padding: 1.25rem; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07); border-top: 6px solid #888; }
+    .challenge-card.c1 { border-top-color: #d9534f; }
+    .challenge-card.c2 { border-top-color: #e0a800; }
+    .challenge-card.c3 { border-top-color: #2d6a9f; }
+    .challenge-card .ch-tag { font-family: 'Google Sans', sans-serif; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; color: #888; }
+    .challenge-card.c1 .ch-tag { color: #d9534f; }
+    .challenge-card.c2 .ch-tag { color: #e0a800; }
+    .challenge-card.c3 .ch-tag { color: #2d6a9f; }
+    .challenge-card .ch-title { font-family: 'Google Sans', sans-serif; font-weight: 700; font-size: 1.15rem; margin: 0.2rem 0 0.6rem 0; }
+    .takeaway { background: #eef4f9; border-radius: 8px; padding: 0.9rem 1.2rem; margin: 1rem 0 0.5rem 0; }
+    .takeaway b { color: #2d6a9f; }
+    .skill-green { color: #3a9679; font-weight: 700; }
+    .skill-red { color: #d9534f; font-weight: 700; }
+    .skill-blue { color: #2d6a9f; font-weight: 700; }
+    figure.fig img { border-radius: 8px; }
+    figure.fig figcaption { font-size: 0.9rem; color: #666; margin-top: 0.6rem; }
+  </style>
 </head>
 
 <body>
-  <section class="hero">
+
+  <!-- ===================== STICKY NAV ===================== -->
+  <nav class="navbar is-light is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="container is-max-desktop">
+      <div class="navbar-brand">
+        <a class="navbar-item has-text-weight-bold" href="#top">BOSS</a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="bossNav">
+          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="bossNav" class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item" href="#oss">What is OSS?</a>
+          <a class="navbar-item" href="#benchmark">The Benchmark</a>
+          <a class="navbar-item" href="#results">Results</a>
+          <a class="navbar-item" href="#bibtex">BibTeX</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO / HEADER ===================== -->
+  <section class="hero" id="top" style="padding-top: 4rem;">
     <div class="hero-body">
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">BOSS:<br><span style="font-size:2.4rem;">Benchmark for Observation Space Shift in Long-Horizon Task</span></h1>
-            <div class="is-size-5 publication-authors">
-              <span class="author-block">
-                <a href="https://yy-gx.github.io/">Yue Yang</a><sup>1</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://lfzhao.com/">Linfeng Zhao</a><sup>2</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://dingmyu.github.io/">Mingyu Ding</a><sup>1</sup>,
-              </span>
-              <br>
-              <span class="author-block">
-                <a href="https://www.gedasbertasius.com/">Gedas Bertasius</a><sup>1</sup>,
-              </span>
-              <span class="author-block">
-                <a href="http://www.danszafir.com/">Daniel Szafir</a><sup>1</sup>,
-              </span>              
+            <h1 class="title is-1 publication-title">BOSS:<br><span style="font-size:2.2rem;">A Benchmark for Observation Space Shift in Long-Horizon Task</span></h1>
+
+            <div class="venue-badges">
+              <span class="tag is-medium is-dark">IEEE RA-L 2025</span>
+              <span class="tag is-medium is-info">ICRA 2026</span>
             </div>
 
-            
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><a href="https://yy-gx.github.io/">Yue Yang</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://lfzhao.com/">Linfeng Zhao</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://dingmyu.github.io/">Mingyu Ding</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://www.gedasbertasius.com/">Gedas Bertasius</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="http://www.danszafir.com/">Daniel Szafir</a><sup>1</sup></span>
+            </div>
+
             <div class="is-size-5 publication-authors">
               <span class="author-block"><sup>1</sup>The University of North Carolina at Chapel Hill,</span>
               <span class="author-block"><sup>2</sup>Northeastern University</span>
+              <br>
+              <span class="author-block"><sup></sup>Corresponding author: Yue Yang (yygx@cs.unc.edu)</span>
             </div>
 
             <div class="column has-text-centered">
               <div class="publication-links">
+                <!-- Link buttons preserved from the existing BOSS repo (unchanged). -->
                 <!-- PDF Link. -->
                 <span class="link-block">
                   <a href="https://arxiv.org/pdf/2502.15679"
@@ -82,15 +135,6 @@
                     <span>Paper</span>
                   </a>
                 </span>
-                <!-- Video Link. -->
-                <!-- <span class="link-block">
-                  <a href="https://www.youtube.com/watch?v=SIcPxapIgBI" class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fab fa-youtube"></i>
-                    </span>
-                    <span>Video</span>
-                  </a>
-                </span> -->
                 <!-- Code Link. -->
                 <span class="link-block">
                   <a href="https://github.com/Boss-Benchmark/BOSS"
@@ -101,25 +145,332 @@
                     <span>Code</span>
                   </a>
                 </span>
-                <!-- CoLab Link. -->
-                <!-- <span class="link-block">
-                  <a href="https://colab.research.google.com/github/openvla/openvla/blob/main/examples/openvla.ipynb"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <img src="static/images/colab_icon.png" />
-                    </span>
-                    <span>Let's try it!</span>
-                  </a>
-                </span> -->
-
               </div>
-
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- ===================== TEASER + ABSTRACT ===================== -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <figure class="fig has-text-centered">
+          <img src="static/images/illustration_OSM.png" alt="Observation Space Shift illustration: a potato left in a bowl shifts the observation space of the next skill." />
+          <figcaption>
+            <b>Observation Space Shift (OSS).</b> Chaining
+            <span class="skill-green">PlaceObject(potato, bowl)</span> &rarr;
+            <span class="skill-blue">MoveContainer(bowl, cabinet)</span>: the potato left in the bowl shifts the
+            observation space of the second skill, which was only trained on an <em>empty</em> bowl &mdash; so it fails.
+          </figcaption>
+        </figure>
+
+        <h2 class="subtitle has-text-centered" style="margin-top: 1.5rem;">
+          Hierarchical robots solve long-horizon tasks by chaining individually trained visuomotor skills. We identify
+          <b>Observation Space Shift (OSS)</b>: a preceding skill changes parts of the scene that are <em>irrelevant</em>
+          to the next skill's logic yet still visible in its camera input, pushing the next policy out of its training
+          distribution. We introduce <b>BOSS</b>, a benchmark built on LIBERO with three progressive challenges, and show
+          that OSS is common and severe across four imitation-learning baselines &mdash; and that three intuitive
+          mitigations all fail to resolve it.
+        </h2>
+
+        <!-- Impact stat band -->
+        <div class="stat-band">
+          <div class="columns is-centered has-text-centered">
+            <div class="column">
+              <div class="stat-number stat-rnn">up to 67%</div>
+              <div class="stat-label">average performance drop from a <em>single</em> irrelevant change (C1)</div>
+            </div>
+            <div class="column">
+              <div class="stat-number stat-acc">76%</div>
+              <div class="stat-label">of tasks hit by OSS once three modifications accumulate (C2)</div>
+            </div>
+            <div class="column">
+              <div class="stat-number stat-mit">0 / 3</div>
+              <div class="stat-label">intuitive mitigations sufficient to resolve OSS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 1: WHAT IS OSS ===================== -->
+  <section class="section" id="oss">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">What is Observation Space Shift?</h2>
+          <div class="content has-text-justified">
+            <p>
+              Skill chaining &mdash; sequentially executing pre-learned visuomotor skills &mdash; is a simple yet powerful
+              way to tackle long-horizon robot tasks. But failures often arise at skill transitions: the terminal state of
+              one skill can fall outside the initial-state distribution the next skill was trained on. Crucially, the
+              culprit is frequently a change that is <em>logically irrelevant</em> to the next skill, yet still appears in
+              its visual observation.
+            </p>
+            <p>
+              Consider chaining <span class="skill-green">PlaceObject(potato, bowl)</span> with
+              <span class="skill-blue">MoveContainer(bowl, cabinet)</span>. The second policy was only ever trained on an
+              empty bowl, so the leftover potato creates a visual mismatch that breaks it &mdash; even though moving the bowl
+              is still perfectly feasible. We call this <b>Observation Space Shift (OSS)</b>.
+            </p>
+
+            <div class="def-box">
+              <div class="def-title">Formal definition</div>
+              <p>
+                We model the environment as a POMDP $\langle \mathcal{S}, \mathcal{O}, \mathcal{A}, \mathcal{T},
+                \mathcal{Z}, r, \gamma \rangle$, where the observation space $\mathcal{O}$ includes third-person camera
+                views and proprioception. Following Task and Motion Planning, a <em>predicate</em>
+                $\psi_i : \mathcal{S} \to \{0, 1\}$ is a binary property of the state (e.g. $\texttt{In(potato, bowl)}$),
+                and an operator $op = \langle \textit{Pre}, \textit{Eff}, c \rangle$ specifies a skill's preconditions,
+                effects, and cost.
+              </p>
+              <p style="margin-bottom:0;">
+                A predicate is <em>irrelevant</em> to an operator when $\psi_i \notin \textit{Pre} \cup \textit{Eff}$ &mdash;
+                it does not affect feasibility. <b>OSS</b> is the problem in which changes to such irrelevant predicates in
+                the visual observation space $\mathcal{O}$, caused by the effects of preceding skills, degrade the
+                performance of the current visuomotor policy.
+              </p>
+            </div>
+
+            <p>
+              Prior skill-transition methods don't address this well: offline transition policies assume each skill's
+              initial states are always reachable (here, that would mean <em>undoing</em> the potato placement, which is
+              logically invalid), while online fine-tuning assumes policies can be continually retrained &mdash; impractical
+              when OSS can occur at <em>every</em> transition of a long-horizon task.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 2: THE BENCHMARK ===================== -->
+  <section class="section" id="benchmark" style="background:#fafafa;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">The BOSS Benchmark</h2>
+          <div class="content has-text-justified">
+            <p>
+              BOSS is built on the <a href="https://libero-project.github.io/">LIBERO</a> simulator (a Franka Emika Panda
+              arm across 12 manipulation scenes). We start from <b>44 single-skill tasks</b> drawn from LIBERO-100, then
+              generate modified counterparts with our <b>Rule-based Automatic Modification Generator (RAMG)</b>, which edits
+              PDDL predicates &mdash; repositioning or adding objects, toggling fixtures (e.g. opening a drawer), and changing
+              containment relations &mdash; while preserving each skill's feasibility and logical consistency. RAMG can
+              produce up to <b>1,727 single-modification variants</b>, giving a large, controllable testbed for OSS.
+            </p>
+          </div>
+
+          <figure class="fig has-text-centered">
+            <img src="static/images/bms.png" style="width:100%; height:auto;"
+              alt="Overview of the three BOSS challenges: Single Predicate Shift, Accumulated Predicate Shift, and Skill Chaining." />
+            <figcaption>
+              The three BOSS challenges, illustrated with the skills
+              <span class="skill-green">OpenDrawer(cabinet, bottom)</span>,
+              <span class="skill-red">PlaceObject(potato, bowl)</span>, and
+              <span class="skill-blue">MoveContainer(bowl, cabinet)</span>. Circles mark the modified (irrelevant)
+              predicates that induce OSS.
+            </figcaption>
+          </figure>
+
+          <div class="columns" style="margin-top: 2rem;">
+            <div class="column">
+              <div class="challenge-card c1">
+                <div class="ch-tag">Challenge 1</div>
+                <div class="ch-title">Single Predicate Shift</div>
+                <p>Tests robustness to a <b>single</b> irrelevant modification introduced by the immediately preceding
+                  skill (e.g. a potato placed in the bowl the robot must now move).</p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="challenge-card c2">
+                <div class="ch-tag">Challenge 2</div>
+                <div class="ch-title">Accumulated Predicate Shift</div>
+                <p>Tests the <b>cumulative</b> effect of two or three modifications from multiple preceding skills (e.g. a
+                  potato in the bowl <em>and</em> an open drawer), a harder, more realistic scenario.</p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="challenge-card c3">
+                <div class="ch-tag">Challenge 3</div>
+                <div class="ch-title">Skill Chaining</div>
+                <p>Evaluates <b>10 real long-horizon tasks</b>, each a chain of three skills, end-to-end &mdash; directly
+                  measuring how OSS degrades full-task success.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 3: RESULTS ===================== -->
+  <section class="section" id="results">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">Results</h2>
+          <div class="content has-text-justified">
+            <p>
+              We evaluate four widely used imitation-learning baselines: three Behavioral Cloning policies from LIBERO
+              (<b>BC-RESNET-RNN</b>, <b>BC-RESNET-T</b>, <b>BC-VIT-T</b>) and the vision-language-action model
+              <b>OpenVLA</b>. For C1/C2 we report the <b>Ratio Performance Delta (RPD)</b> &mdash; the relative drop in
+              success rate caused by OSS; for C3 we report the <b>Delta to Upper Bound Ratio (DUBR)</b> &mdash; the
+              normalized gap between the chain's actual success and its OSS-free upper bound. All results average over three
+              seeds.
+            </p>
+          </div>
+
+          <!-- C1 -->
+          <h3 class="title is-4">Challenge 1 &mdash; Single Predicate Shift</h3>
+          <figure class="fig has-text-centered">
+            <img src="static/images/ch1_results.png"
+              alt="C1 scatter plots: success rate on modified vs. unaffected tasks for each baseline." />
+            <figcaption>
+              Each point is a task pair (success unaffected vs. modified). Points below the diagonal are hurt by OSS;
+              darker = larger RPD.
+            </figcaption>
+          </figure>
+          <div class="takeaway">
+            <b>Takeaway:</b> Even a single irrelevant change is damaging. 50&ndash;68% of tasks degrade, with average
+            performance drops of <b>67% / 35% / 34% / 54%</b> for BC-RESNET-RNN, BC-RESNET-T, BC-VIT-T, and OpenVLA.
+            BC-VIT-T fares best (attention helps focus on task-relevant features); the RNN fares worst.
+          </div>
+
+          <br>
+          <!-- C2 -->
+          <h3 class="title is-4">Challenge 2 &mdash; Accumulated Predicate Shift</h3>
+          <figure class="fig has-text-centered">
+            <img src="static/images/ch2_results_final_new.png" style="max-width:760px; width:100%;"
+              alt="C2 bar charts: average positive RPD and OSS occurrence rate for 1, 2, and 3 modifications." />
+            <figcaption>
+              (top) Average positive RPD and (bottom) OSS occurrence rate, for 1, 2, and 3 accumulated modifications.
+            </figcaption>
+          </figure>
+          <div class="takeaway">
+            <b>Takeaway:</b> OSS compounds. As modifications accumulate (1&rarr;2&rarr;3), both severity (average RPD
+            <b>0.48 &rarr; 0.59 &rarr; 0.62</b>) and frequency (<b>61.9% &rarr; 70.5% &rarr; 76.1%</b>) rise &mdash; exactly
+            the regime a long-horizon task lives in.
+          </div>
+
+          <br>
+          <!-- C3 -->
+          <h3 class="title is-4">Challenge 3 &mdash; Skill Chaining</h3>
+          <figure class="fig has-text-centered">
+            <img src="static/images/ch3_results.png" style="width:100%; height:auto;"
+              alt="C3 bar chart: Delta to Upper Bound Ratio across 10 long-horizon tasks for each baseline." />
+            <figcaption>
+              Delta to Upper Bound Ratio (DUBR) across 10 three-skill long-horizon tasks. (Some BC-RESNET-RNN bars read 0%
+              because its OSS-free upper bound is already 0% &mdash; it fails even without OSS.)
+            </figcaption>
+          </figure>
+          <div class="takeaway">
+            <b>Takeaway:</b> On real long-horizon tasks, the gap to the OSS-free upper bound is large and positive across
+            nearly every task &mdash; OSS sharply reduces end-to-end success.
+          </div>
+
+          <br>
+          <!-- Data augmentation -->
+          <h3 class="title is-4">Can data augmentation fix it? No.</h3>
+          <div class="content has-text-justified">
+            <p>
+              A natural idea is to expose policies to more visual variety during training. We used RAMG to generate
+              <b>1,727</b> modified environments and replayed demonstrations to build a new dataset of <b>~57,000</b>
+              demonstrations &mdash; nearly <b>30&times;</b> the original LIBERO data for these 44 tasks. We then compare
+              <b>Setup A</b> (trained on original data) with <b>Setup B</b> (trained on the augmented data), both evaluated
+              on the same modified C1 tasks.
+            </p>
+          </div>
+          <figure class="fig has-text-centered">
+            <img src="static/images/table_results.png" style="max-width:620px; width:100%;"
+              alt="Table: success rate on Setup A vs Setup B and their difference for each baseline." />
+            <figcaption>Success rate under Setup A vs. Setup B (and their difference A&minus;B).</figcaption>
+          </figure>
+          <div class="takeaway">
+            <b>Takeaway:</b> Augmentation barely helped one baseline (BC-RESNET-RNN, +0.06) and <b>hurt</b> the others
+            (BC-RESNET-T &minus;0.13, BC-VIT-T &minus;0.10, OpenVLA &plusmn;0). The combinatorial explosion of
+            skill-induced scene variations is simply too large to cover by augmentation &mdash; even in simulation.
+          </div>
+
+          <br>
+          <!-- Other mitigations -->
+          <h3 class="title is-4">Other mitigations also fall short</h3>
+          <div class="content has-text-justified">
+            <p>We tested two more intuitive strategies on C1, and neither resolves OSS:</p>
+            <ul>
+              <li>
+                <b>Frozen robotics-specific vision encoders</b> (R3M, LIV). Replacing the trainable encoder with frozen
+                pretrained ones still leaves <b>55%</b> (BC-R3M-T) and <b>61%</b> (BC-LIV-T) of tasks affected, with
+                average RPD of <b>29%</b> and <b>26%</b>.
+              </li>
+              <li>
+                <b>3D point-cloud policies</b> (3D Diffuser Actor). Despite better viewpoint generalization, <b>73%</b> of
+                tasks are still affected, with average RPD <b>37%</b> &mdash; even image-free policies remain vulnerable to
+                OSS.
+              </li>
+            </ul>
+            <p>
+              Together with the data-augmentation result, this shows that current baselines lack any mechanism to handle
+              OSS, motivating the need for new, OSS-targeted algorithms.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BIBTEX ===================== -->
+  <section class="section" id="bibtex">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@article{yang2025boss,
+    title   = {BOSS: A Benchmark for Observation Space Shift in Long-Horizon Task},
+    author  = {Yang, Yue and Zhao, Linfeng and Ding, Mingyu and Bertasius, Gedas and Szafir, Daniel},
+    journal = {IEEE Robotics and Automation Letters},
+    year    = {2025},
+    doi     = {10.1109/LRA.2025.3585390},
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content has-text-centered">
+            <p>
+              <b>Acknowledgements.</b> This work was supported in part by NSF under Award 2222953, in part by the
+              Laboratory for Analytic Sciences via NC State University, and in part by ONR under Award N00014-23-1-2356.
+            </p>
+            <p>
+              Website template borrowed from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> under a
+              <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0
+                International</a> license.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Sticky navbar burger toggle (mobile)
+    document.addEventListener('DOMContentLoaded', function () {
+      var burger = document.querySelector('.navbar-burger');
+      if (burger) {
+        burger.addEventListener('click', function () {
+          var target = document.getElementById(burger.dataset.target);
+          burger.classList.toggle('is-active');
+          target.classList.toggle('is-active');
+        });
+      }
+    });
+  </script>
 
 </body>
 
