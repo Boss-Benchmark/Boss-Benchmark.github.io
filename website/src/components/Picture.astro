@@ -8,6 +8,9 @@ interface Props {
   priority?: boolean;
   invertInDarkMode?: boolean;
   sizes?: string;
+  /** Cap the rendered height in px. Figures with very different aspect ratios
+   *  otherwise render at wildly different heights once width-constrained. */
+  maxHeight?: number;
 }
 
 const {
@@ -16,6 +19,7 @@ const {
   priority = false,
   invertInDarkMode = false,
   sizes = "(min-width: 46rem) 40rem, 100vw",
+  maxHeight,
 } = Astro.props;
 
 let image: ImageMetadata;
@@ -29,6 +33,7 @@ if (typeof src === "string") {
 
 <AstroPicture
   class={`rounded-lg max-h-[calc(100svh-3rem)] max-w-full w-min mx-auto ${invertInDarkMode ? "dark:invert" : ""}`}
+  style={maxHeight ? `max-height:${maxHeight}px;width:auto` : undefined}
   src={image}
   alt={alt}
   layout="constrained"

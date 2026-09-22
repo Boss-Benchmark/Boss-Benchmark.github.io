@@ -1,9 +1,19 @@
 ---
+interface Props {
+  /** Let a very wide figure run past the text column instead of shrinking to
+   *  a thin strip. */
+  wide?: boolean;
+}
+
+const { wide = false } = Astro.props;
 ---
 
 <figure class="full-bleed my-12">
   <div
-    class="mx-auto flex w-full max-w-[72rem] justify-start overflow-x-auto px-6 **:my-0 [&_img]:min-w-[36rem] sm:[&_img]:min-w-0 sm:justify-center"
+    class:list={[
+      "mx-auto flex w-full justify-start overflow-x-auto px-6 **:my-0 [&_img]:min-w-[36rem] sm:[&_img]:min-w-0 sm:justify-center",
+      wide ? "max-w-[100rem]" : "max-w-[72rem]",
+    ]}
   >
     <slot name="figure" />
   </div>
