@@ -161,9 +161,9 @@ For C1 and C2 we report the **Ratio Performance Delta (RPD)** — the relative d
 Even a single irrelevant change is damaging. 50–68% of tasks degrade, with average performance drops of **67% / 35% / 34% / 54%** for BC-RESNET-RNN, BC-RESNET-T, BC-VIT-T and OpenVLA. BC-VIT-T fares best — attention appears to help it focus on task-relevant features — and the RNN fares worst.
 </Takeaway>
 
-<Figure>
-  <Picture slot="figure" maxHeight={340} src={ch2Results} alt="Two grouped bar charts showing both the severity and the frequency of OSS rising as modifications accumulate." />
-  <span slot="caption">**Challenge 2.** Average positive RPD (top) and OSS occurrence rate (bottom), for one, two and three accumulated modifications.</span>
+<Figure wide>
+  <Picture slot="figure" maxHeight={340} sizes="(min-width: 46rem) 100rem, 100vw" src={ch2Results} alt="Two grouped bar charts showing both the severity and the frequency of OSS rising as modifications accumulate." />
+  <span slot="caption">**Challenge 2.** Average positive RPD (left) and OSS occurrence rate (right), for one, two and three accumulated modifications.</span>
 </Figure>
 
 <Takeaway>
