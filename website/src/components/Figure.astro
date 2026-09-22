@@ -1,7 +1,8 @@
 ---
 interface Props {
-  /** Let a very wide figure run past the text column instead of shrinking to
-   *  a thin strip. */
+  /** Let one very wide figure run a little past the text column. The inner
+   *  div carries px-6, so the image itself is 3rem narrower than these caps:
+   *  44rem (exactly the text measure) by default, 56rem when wide. */
   wide?: boolean;
 }
 
@@ -12,7 +13,7 @@ const { wide = false } = Astro.props;
   <div
     class:list={[
       "mx-auto flex w-full justify-start overflow-x-auto px-6 **:my-0 [&_img]:min-w-[36rem] sm:[&_img]:min-w-0 sm:justify-center",
-      wide ? "max-w-[100rem]" : "max-w-[72rem]",
+      wide ? "max-w-[59rem]" : "max-w-[47rem]",
     ]}
   >
     <slot name="figure" />
