@@ -1,25 +1,35 @@
 ---
 interface Props {
-  /** Let one very wide figure run a little past the text column. The inner
-   *  div carries px-6, so the image itself is 3rem narrower than these caps:
-   *  44rem (exactly the text measure) by default, 56rem when wide. */
-  wide?: boolean;
+  /** How wide the image may run. "text" is exactly the prose measure, "wide"
+   *  lets a long strip run a little past it, "narrow" pulls a small figure in.
+   *  Each cap is 3rem over the image width because the inner div carries px-6;
+   *  the caption reuses the same cap so it is always as wide as the image. */
+  size?: "narrow" | "text" | "wide";
 }
 
-const { wide = false } = Astro.props;
+const { size = "text" } = Astro.props;
+
+const widthCap = {
+  narrow: "max-w-[38rem]",
+  text: "max-w-[47rem]",
+  wide: "max-w-[59rem]",
+}[size];
 ---
 
 <figure class="full-bleed my-12">
   <div
     class:list={[
       "mx-auto flex w-full justify-start overflow-x-auto px-6 **:my-0 [&_img]:min-w-[36rem] sm:[&_img]:min-w-0 sm:justify-center",
-      wide ? "max-w-[59rem]" : "max-w-[47rem]",
+      widthCap,
     ]}
   >
     <slot name="figure" />
   </div>
   <figcaption
-    class="text-muted-foreground mx-auto mt-4 max-w-[calc(var(--maximum-text-width)*0.9)] px-6 text-left text-[0.9375rem] leading-[1.6]"
+    class:list={[
+      "text-muted-foreground mx-auto mt-4 px-6 text-left text-[0.9375rem] leading-[1.6]",
+      widthCap,
+    ]}
   >
     <slot name="caption" />
   </figcaption>

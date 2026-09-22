@@ -25,6 +25,10 @@ export default defineConfig({
   integrations: [
     icon(),
     astroExpressiveCode({
+      // The default GitHub themes are cool-toned (bright blues, purple, pink)
+      // and fight the warm paper palette. Vitesse is muted and earthy: its
+      // green and rust sit close to the --skill-open / --skill-place tokens.
+      themes: ["vitesse-dark", "vitesse-light"],
       styleOverrides: {
         borderRadius: "0.5rem",
         borderWidth: "0",

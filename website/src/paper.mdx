@@ -152,8 +152,8 @@ We evaluate four widely used imitation-learning baselines: three Behavioral Clon
 
 For C1 and C2 we report the **Ratio Performance Delta (RPD)** — the relative drop in success rate caused by OSS. For C3 we report the **Delta to Upper Bound Ratio (DUBR)** — the normalized gap between the chain's actual success and its OSS-free upper bound. All results average over three seeds.
 
-<Figure>
-  <Picture slot="figure" src={ch1Results} alt="Four scatter plots, one per baseline, with most points falling below the diagonal." />
+<Figure size="wide">
+  <Picture slot="figure" sizes="(min-width: 46rem) 56rem, 100vw" src={ch1Results} alt="Four scatter plots, one per baseline, with most points falling below the diagonal." />
   <span slot="caption">**Challenge 1.** Each point is a task pair: success rate unaffected by OSS on the x-axis, on the modified counterpart on the y-axis. Points below the diagonal are hurt by OSS; darker means larger RPD.</span>
 </Figure>
 
@@ -170,7 +170,7 @@ Even a single irrelevant change is damaging. 50–68% of tasks degrade, with ave
 OSS compounds. As modifications accumulate from one to three, both severity (average RPD **0.48 → 0.59 → 0.62**) and frequency (**61.9% → 70.5% → 76.1%**) rise — exactly the regime a long-horizon task lives in.
 </Takeaway>
 
-<Figure wide>
+<Figure size="wide">
   <Picture slot="figure" sizes="(min-width: 46rem) 56rem, 100vw" src={ch3Results} alt="Grouped bar chart of DUBR per long-horizon task, positive and large for nearly every task and baseline." />
   <span slot="caption">**Challenge 3.** Delta to Upper Bound Ratio across 10 three-skill long-horizon tasks. Some BC-RESNET-RNN bars read 0% because its OSS-free upper bound is already 0% — it fails even without OSS.</span>
 </Figure>
@@ -183,8 +183,8 @@ On real long-horizon tasks the gap to the OSS-free upper bound is large and posi
 
 A natural idea is to expose policies to more visual variety during training. We used RAMG to generate **1,727** modified environments and replayed demonstrations to build a new dataset of **~57,000** demonstrations — nearly **30×** the original LIBERO data for these 44 tasks. We then compare **Setup A** (trained on original data) with **Setup B** (trained on the augmented data), both evaluated on the same modified C1 tasks.
 
-<Figure>
-  <Picture slot="figure" src={tableResults} alt="Table comparing success rates for the four baselines trained on original versus augmented data." />
+<Figure size="narrow">
+  <Picture slot="figure" sizes="(min-width: 46rem) 35rem, 100vw" src={tableResults} alt="Table comparing success rates for the four baselines trained on original versus augmented data." />
   <span slot="caption">Success rate under Setup A versus Setup B, and their difference A−B.</span>
 </Figure>
 
