@@ -55,6 +55,15 @@ main .katex-display {
   overflow: auto hidden;
 }
 
+/* KaTeX ships `font: 1.21em ...`, which makes inline math visibly larger than
+   the prose around it. Computer Modern has a smaller x-height than Source
+   Serif, so 1.05em -- not a literal 1em -- is what actually reads as equal.
+   katex.css is bundled after this file, so a bare `.katex` would lose the
+   cascade on equal specificity; the `main` prefix is what makes this win. */
+main .katex {
+  font-size: 1.05em;
+}
+
 .katex-display > .katex > .katex-html {
   padding-inline: 1.5rem;
   width: max-content;

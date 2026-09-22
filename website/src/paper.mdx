@@ -121,8 +121,8 @@ Prior skill-transition methods don't address this well. Offline transition polic
 
 BOSS is built on the [LIBERO](https://libero-project.github.io/) simulator — a Franka Emika Panda arm across 12 manipulation scenes. We start from **44 single-skill tasks** drawn from LIBERO-100, then generate modified counterparts with our **Rule-based Automatic Modification Generator (RAMG)**, which edits PDDL predicates — repositioning or adding objects, toggling fixtures such as opening a drawer, and changing containment relations — while preserving each skill's feasibility and logical consistency. RAMG can produce up to **1,727 single-modification variants**, giving a large, controllable testbed for OSS.
 
-<Figure>
-  <Picture slot="figure" src={challenges} alt="Diagram of the three BOSS challenges, showing a single predicate shift, accumulated predicate shifts, and a full three-skill chain." />
+<Figure size="wide">
+  <Picture slot="figure" sizes="(min-width: 46rem) 56rem, 100vw" src={challenges} alt="Diagram of the three BOSS challenges, showing a single predicate shift, accumulated predicate shifts, and a full three-skill chain." />
   <span slot="caption">The three BOSS challenges, illustrated with the skills <span class="skill-open">`OpenDrawer(cabinet, bottom)`</span>, <span class="skill-place">`PlaceObject(potato, bowl)`</span>, and <span class="skill-move">`MoveContainer(bowl, cabinet)`</span>. Circles mark the modified — irrelevant — predicates that induce OSS.</span>
 </Figure>
 
@@ -215,7 +215,7 @@ Together with the data-augmentation result, this shows that current baselines la
 
 The code, the pre-trained skill policies for all three BC baselines, and the augmented dataset are all public.
 
-```shell
+```shell frame="none"
 git clone https://github.com/Boss-Benchmark/BOSS.git && cd BOSS
 conda env create -f environment.yml && conda activate boss
 pip install -e .
