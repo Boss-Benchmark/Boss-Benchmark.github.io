@@ -1,0 +1,48 @@
+---
+/**
+ * The three BOSS challenges as cards with a coloured top rule, carried over
+ * from the original project page. The colours run C1 -> C2 -> C3 in increasing
+ * severity, matching how the challenges escalate.
+ */
+interface Challenge {
+  tag: string;
+  title: string;
+  body: string;
+}
+
+interface Props {
+  challenges: Challenge[];
+}
+
+const { challenges } = Astro.props;
+
+const accents = [
+  "var(--skill-place)",
+  "var(--accent-amber)",
+  "var(--skill-move)",
+];
+---
+
+<div class="not-prose my-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+  {
+    challenges.map((c, i) => (
+      <div
+        class="border-border bg-card flex flex-col rounded-xl border border-t-[5px] p-5"
+        style={`border-top-color: ${accents[i % accents.length]}`}
+      >
+        <div
+          class="text-xs font-bold tracking-[0.08em] uppercase"
+          style={`color: ${accents[i % accents.length]}`}
+        >
+          {c.tag}
+        </div>
+        <div class="text-foreground mt-1 mb-2 text-lg font-semibold tracking-tight">
+          {c.title}
+        </div>
+        <p class="text-muted-foreground m-0 text-[0.95rem] leading-relaxed">
+          <Fragment set:html={c.body} />
+        </p>
+      </div>
+    ))
+  }
+</div>

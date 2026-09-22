@@ -10,6 +10,8 @@ import Figure from "./components/Figure.astro";
 import Picture from "./components/Picture.astro";
 import TwoColumns from "./components/TwoColumns.astro";
 import KeyNumbers from "./components/KeyNumbers.astro";
+import ChallengeCards from "./components/ChallengeCards.astro";
+import Takeaway from "./components/Takeaway.astro";
 
 import teaser from "./assets/illustration_OSM.png";
 import challenges from "./assets/bms.png";
@@ -70,7 +72,7 @@ import tableResults from "./assets/table_results.png";
 
 <Figure>
   <Picture slot="figure" src={teaser} alt="A robot places a potato into a bowl, then fails to move that bowl into a cabinet because the policy was only trained on an empty bowl." />
-  <span slot="caption">**Observation Space Shift (OSS).** Chaining `PlaceObject(potato, bowl)` → `MoveContainer(bowl, cabinet)`: the potato left in the bowl shifts the observation space of the second skill, which was only trained on an *empty* bowl — so it fails.</span>
+  <span slot="caption">**Observation Space Shift (OSS).** Chaining <span class="skill-place">`PlaceObject(potato, bowl)`</span> → <span class="skill-move">`MoveContainer(bowl, cabinet)`</span>: the potato left in the bowl shifts the observation space of the second skill, which was only trained on an *empty* bowl — so it fails.</span>
 </Figure>
 
 <HighlightedSection>
@@ -83,10 +85,10 @@ Hierarchical robots solve long-horizon tasks by chaining individually trained vi
 
 <KeyNumbers
   stats={[
-    { value: "up to 67%", label: "average performance drop from a single irrelevant change", sub: "Challenge 1" },
-    { value: "76%", label: "of tasks hit by OSS once three modifications accumulate", sub: "Challenge 2" },
-    { value: "0 / 3", label: "intuitive mitigations sufficient to resolve OSS", sub: "augmentation, frozen encoders, 3D policies" },
-    { value: "1,727", label: "modified task variants generated automatically", sub: "Rule-based Automatic Modification Generator" },
+    { value: "up to 67%", label: "average performance drop from a single irrelevant change", sub: "Challenge 1", tone: "place" },
+    { value: "76%", label: "of tasks hit by OSS once three modifications accumulate", sub: "Challenge 2", tone: "amber" },
+    { value: "0 / 3", label: "intuitive mitigations sufficient to resolve OSS", sub: "augmentation, frozen encoders, 3D policies", tone: "move" },
+    { value: "1,727", label: "modified task variants generated automatically", sub: "Rule-based Automatic Modification Generator", tone: "open" },
   ]}
 />
 
@@ -94,7 +96,7 @@ Hierarchical robots solve long-horizon tasks by chaining individually trained vi
 
 Skill chaining — sequentially executing pre-learned visuomotor skills — is a simple yet powerful way to tackle long-horizon robot tasks. But failures often arise at skill transitions: the terminal state of one skill can fall outside the initial-state distribution the next skill was trained on. Crucially, the culprit is frequently a change that is **logically irrelevant** to the next skill, yet still appears in its visual observation.
 
-Consider chaining `PlaceObject(potato, bowl)` with `MoveContainer(bowl, cabinet)`. The second policy was only ever trained on an empty bowl, so the leftover potato creates a visual mismatch that breaks it — even though moving the bowl is still perfectly feasible. We call this **Observation Space Shift (OSS)**.
+Consider chaining <span class="skill-place">`PlaceObject(potato, bowl)`</span> with <span class="skill-move">`MoveContainer(bowl, cabinet)`</span>. The second policy was only ever trained on an empty bowl, so the leftover potato creates a visual mismatch that breaks it — even though moving the bowl is still perfectly feasible. We call this **Observation Space Shift (OSS)**.
 
 <TwoColumns>
 <div slot="left">
@@ -121,20 +123,28 @@ BOSS is built on the [LIBERO](https://libero-project.github.io/) simulator — a
 
 <Figure>
   <Picture slot="figure" src={challenges} alt="Diagram of the three BOSS challenges, showing a single predicate shift, accumulated predicate shifts, and a full three-skill chain." />
-  <span slot="caption">The three BOSS challenges, illustrated with the skills `OpenDrawer(cabinet, bottom)`, `PlaceObject(potato, bowl)`, and `MoveContainer(bowl, cabinet)`. Circles mark the modified — irrelevant — predicates that induce OSS.</span>
+  <span slot="caption">The three BOSS challenges, illustrated with the skills <span class="skill-open">`OpenDrawer(cabinet, bottom)`</span>, <span class="skill-place">`PlaceObject(potato, bowl)`</span>, and <span class="skill-move">`MoveContainer(bowl, cabinet)`</span>. Circles mark the modified — irrelevant — predicates that induce OSS.</span>
 </Figure>
 
-### Challenge 1 — Single Predicate Shift
-
-Tests robustness to a **single** irrelevant modification introduced by the immediately preceding skill, such as a potato placed in the bowl the robot must now move.
-
-### Challenge 2 — Accumulated Predicate Shift
-
-Tests the **cumulative** effect of two or three modifications from multiple preceding skills — a potato in the bowl *and* an open drawer — a harder and more realistic scenario.
-
-### Challenge 3 — Skill Chaining
-
-Evaluates **10 real long-horizon tasks**, each a chain of three skills, end to end, directly measuring how OSS degrades full-task success.
+<ChallengeCards
+  challenges={[
+    {
+      tag: "Challenge 1",
+      title: "Single Predicate Shift",
+      body: "Robustness to a <b>single</b> irrelevant modification introduced by the immediately preceding skill — a potato placed in the bowl the robot must now move.",
+    },
+    {
+      tag: "Challenge 2",
+      title: "Accumulated Predicate Shift",
+      body: "The <b>cumulative</b> effect of two or three modifications from several preceding skills — a potato in the bowl <i>and</i> an open drawer. Harder, and more realistic.",
+    },
+    {
+      tag: "Challenge 3",
+      title: "Skill Chaining",
+      body: "<b>10 real long-horizon tasks</b>, each a chain of three skills, run end to end — measuring directly how OSS degrades full-task success.",
+    },
+  ]}
+/>
 
 ## Results
 
@@ -147,21 +157,27 @@ For C1 and C2 we report the **Ratio Performance Delta (RPD)** — the relative d
   <span slot="caption">**Challenge 1.** Each point is a task pair: success rate unaffected by OSS on the x-axis, on the modified counterpart on the y-axis. Points below the diagonal are hurt by OSS; darker means larger RPD.</span>
 </Figure>
 
-**Even a single irrelevant change is damaging.** 50–68% of tasks degrade, with average performance drops of **67% / 35% / 34% / 54%** for BC-RESNET-RNN, BC-RESNET-T, BC-VIT-T and OpenVLA. BC-VIT-T fares best — attention appears to help it focus on task-relevant features — and the RNN fares worst.
+<Takeaway>
+Even a single irrelevant change is damaging. 50–68% of tasks degrade, with average performance drops of **67% / 35% / 34% / 54%** for BC-RESNET-RNN, BC-RESNET-T, BC-VIT-T and OpenVLA. BC-VIT-T fares best — attention appears to help it focus on task-relevant features — and the RNN fares worst.
+</Takeaway>
 
 <Figure>
   <Picture slot="figure" src={ch2Results} alt="Two grouped bar charts showing both the severity and the frequency of OSS rising as modifications accumulate." />
   <span slot="caption">**Challenge 2.** Average positive RPD (top) and OSS occurrence rate (bottom), for one, two and three accumulated modifications.</span>
 </Figure>
 
-**OSS compounds.** As modifications accumulate from one to three, both severity (average RPD **0.48 → 0.59 → 0.62**) and frequency (**61.9% → 70.5% → 76.1%**) rise — exactly the regime a long-horizon task lives in.
+<Takeaway>
+OSS compounds. As modifications accumulate from one to three, both severity (average RPD **0.48 → 0.59 → 0.62**) and frequency (**61.9% → 70.5% → 76.1%**) rise — exactly the regime a long-horizon task lives in.
+</Takeaway>
 
 <Figure>
   <Picture slot="figure" src={ch3Results} alt="Grouped bar chart of DUBR per long-horizon task, positive and large for nearly every task and baseline." />
   <span slot="caption">**Challenge 3.** Delta to Upper Bound Ratio across 10 three-skill long-horizon tasks. Some BC-RESNET-RNN bars read 0% because its OSS-free upper bound is already 0% — it fails even without OSS.</span>
 </Figure>
 
-**On real long-horizon tasks the gap to the OSS-free upper bound is large and positive across nearly every task** — OSS sharply reduces end-to-end success.
+<Takeaway>
+On real long-horizon tasks the gap to the OSS-free upper bound is large and positive across nearly every task — OSS sharply reduces end-to-end success.
+</Takeaway>
 
 ## Can data augmentation fix it? No.
 
@@ -172,7 +188,9 @@ A natural idea is to expose policies to more visual variety during training. We 
   <span slot="caption">Success rate under Setup A versus Setup B, and their difference A−B.</span>
 </Figure>
 
+<Takeaway>
 Augmentation barely helped one baseline (BC-RESNET-RNN, +0.06) and **hurt** the others (BC-RESNET-T −0.13, BC-VIT-T −0.10, OpenVLA ±0). The combinatorial explosion of skill-induced scene variations is simply too large to cover by augmentation — even in simulation.
+</Takeaway>
 
 ### Other mitigations also fall short
 

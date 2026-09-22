@@ -144,6 +144,13 @@ main .katex-display {
   --input: #bdb5ac;
   --outline: #6f6862;
   --radius: 0.625rem;
+  /* Skill colours, matched to the labels in the paper's figures so the prose
+     and the diagrams agree: OpenDrawer green, PlaceObject red, MoveContainer
+     blue. Contrast against --background is >= 4.5:1 in both themes. */
+  --skill-open: #2f7d54;
+  --skill-place: #b8482c;
+  --skill-move: #2f5fa8;
+  --accent-amber: #8a6600;
 }
 
 [data-theme="dark"] {
@@ -181,6 +188,10 @@ main .katex-display {
   --warning-foreground: #0c0c0c;
   --error: #df785d;
   --error-foreground: #0c0c0c;
+  --skill-open: #5fc98c;
+  --skill-place: #df785d;
+  --skill-move: #7da4ec;
+  --accent-amber: #f2c84b;
   --border: #ffffff1f;
   --input: #ffffff3d;
   --outline: #ffffff3d;
@@ -303,4 +314,30 @@ samp {
   button {
     @apply cursor-pointer;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   BOSS page accents. Carried over from the original project page, retuned to
+   the warm palette above.
+--------------------------------------------------------------------------- */
+
+/* Skill names, coloured to match the figures. */
+.skill-open,
+.skill-place,
+.skill-move {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.skill-open { color: var(--skill-open); }
+.skill-place { color: var(--skill-place); }
+.skill-move { color: var(--skill-move); }
+
+/* Inside the coloured skill spans, keep inline code from fighting the colour. */
+.skill-open code,
+.skill-place code,
+.skill-move code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-weight: 600;
 }

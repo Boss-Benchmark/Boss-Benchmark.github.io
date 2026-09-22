@@ -1,9 +1,20 @@
 ---
 interface Props {
-  stats: { value: string; label: string; sub?: string }[];
+  stats: { value: string; label: string; sub?: string; tone?: Tone }[];
 }
 
+type Tone = "place" | "amber" | "move" | "open";
+
 const { stats } = Astro.props;
+
+// The original project page gave each headline number its own colour; keeping
+// that, mapped onto the theme's skill palette.
+const tones: Record<Tone, string> = {
+  place: "var(--skill-place)",
+  amber: "var(--accent-amber)",
+  move: "var(--skill-move)",
+  open: "var(--skill-open)",
+};
 ---
 
 <dl
@@ -11,8 +22,14 @@ const { stats } = Astro.props;
 >
   {
     stats.map((stat) => (
-      <div class="border-primary/40 border-l-2 pl-4">
-        <dd class="text-primary m-0 text-2xl font-semibold tracking-tight tabular-nums">
+      <div
+        class="border-l-2 pl-4"
+        style={`border-color: ${stat.tone ? tones[stat.tone] : "var(--primary)"}`}
+      >
+        <dd
+          class="m-0 text-3xl font-semibold tracking-tight tabular-nums"
+          style={`color: ${stat.tone ? tones[stat.tone] : "var(--primary)"}`}
+        >
           {stat.value}
         </dd>
         <dt class="text-foreground mt-1 text-sm leading-snug">{stat.label}</dt>

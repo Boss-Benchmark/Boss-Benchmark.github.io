@@ -1,0 +1,19 @@
+---
+/**
+ * The "Takeaway" callout from the original project page: a tinted box that
+ * states what a results figure actually shows, so a reader skimming the
+ * figures still gets the conclusion.
+ */
+---
+
+<aside
+  class="not-prose border-secondary-accent/70 bg-muted my-6 rounded-lg border-l-[4px] px-5 py-4"
+>
+  <span
+    class="text-secondary-accent mr-2 text-xs font-bold tracking-[0.08em] uppercase"
+    >Takeaway</span
+  >
+  <span class="text-foreground text-[1.0625rem] leading-relaxed">
+    <slot />
+  </span>
+</aside>
