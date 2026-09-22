@@ -1,0 +1,230 @@
+---
+title: "BOSS: A Benchmark for Observation Space Shift in Long-Horizon Task"
+theme: light
+description: "Chaining robot skills breaks them: a preceding skill changes parts of the scene that are irrelevant to the next skill's logic, yet still visible in its camera. BOSS measures how much that costs."
+---
+
+import Header from "./components/Header.astro";
+import HighlightedSection from "./components/HighlightedSection.astro";
+import Figure from "./components/Figure.astro";
+import Picture from "./components/Picture.astro";
+import TwoColumns from "./components/TwoColumns.astro";
+import KeyNumbers from "./components/KeyNumbers.astro";
+
+import teaser from "./assets/illustration_OSM.png";
+import challenges from "./assets/bms.png";
+import ch1Results from "./assets/ch1_results.png";
+import ch2Results from "./assets/ch2_results_final_new.png";
+import ch3Results from "./assets/ch3_results.png";
+import tableResults from "./assets/table_results.png";
+
+<Header
+  title="BOSS: A Benchmark for Observation Space Shift in Long-Horizon Task"
+  subtitle="Chaining skills breaks them — and the culprit is a change that shouldn't matter."
+  conference="IEEE RA-L 2025 · ICRA 2026"
+  authors={[
+    {
+      name: "Yue Yang",
+      url: "https://yy-gx.github.io/",
+      institution: "UNC Chapel Hill",
+      notes: ["1", "†"],
+    },
+    {
+      name: "Linfeng Zhao",
+      url: "https://lfzhao.com/",
+      institution: "Northeastern University",
+      notes: ["2"],
+    },
+    {
+      name: "Mingyu Ding",
+      url: "https://dingmyu.github.io/",
+      institution: "UNC Chapel Hill",
+      notes: ["1"],
+    },
+    {
+      name: "Gedas Bertasius",
+      url: "https://www.gedasbertasius.com/",
+      institution: "UNC Chapel Hill",
+      notes: ["1"],
+    },
+    {
+      name: "Daniel Szafir",
+      url: "https://cs.unc.edu/person/daniel-szafir/",
+      institution: "UNC Chapel Hill",
+      notes: ["1"],
+    },
+  ]}
+  notes={[
+    { symbol: "1", text: "The University of North Carolina at Chapel Hill" },
+    { symbol: "2", text: "Northeastern University" },
+    { symbol: "†", text: "Corresponding author: yygx@cs.unc.edu" },
+  ]}
+  links={[
+    { name: "Paper", url: "https://arxiv.org/pdf/2502.15679", icon: "ri:file-pdf-2-line" },
+    { name: "arXiv", url: "https://arxiv.org/abs/2502.15679", icon: "academicons:arxiv" },
+    { name: "Code", url: "https://github.com/Boss-Benchmark/BOSS", icon: "ri:github-line" },
+    { name: "Checkpoints", url: "https://huggingface.co/yygx/BOSS-checkpoints", icon: "ri:box-3-line" },
+    { name: "Data", url: "https://huggingface.co/datasets/yygx/BOSS-data-augmentation", icon: "ri:database-2-line" },
+  ]}
+/>
+
+<Figure>
+  <Picture slot="figure" src={teaser} alt="A robot places a potato into a bowl, then fails to move that bowl into a cabinet because the policy was only trained on an empty bowl." />
+  <span slot="caption">**Observation Space Shift (OSS).** Chaining `PlaceObject(potato, bowl)` → `MoveContainer(bowl, cabinet)`: the potato left in the bowl shifts the observation space of the second skill, which was only trained on an *empty* bowl — so it fails.</span>
+</Figure>
+
+<HighlightedSection>
+
+## Abstract
+
+Hierarchical robots solve long-horizon tasks by chaining individually trained visuomotor skills. We identify **Observation Space Shift (OSS)**: a preceding skill changes parts of the scene that are *irrelevant* to the next skill's logic yet still visible in its camera input, pushing the next policy out of its training distribution. We introduce **BOSS**, a benchmark built on LIBERO with three progressive challenges, and show that OSS is common and severe across four imitation-learning baselines — and that three intuitive mitigations all fail to resolve it.
+
+</HighlightedSection>
+
+<KeyNumbers
+  stats={[
+    { value: "up to 67%", label: "average performance drop from a single irrelevant change", sub: "Challenge 1" },
+    { value: "76%", label: "of tasks hit by OSS once three modifications accumulate", sub: "Challenge 2" },
+    { value: "0 / 3", label: "intuitive mitigations sufficient to resolve OSS", sub: "augmentation, frozen encoders, 3D policies" },
+    { value: "1,727", label: "modified task variants generated automatically", sub: "Rule-based Automatic Modification Generator" },
+  ]}
+/>
+
+## What is Observation Space Shift?
+
+Skill chaining — sequentially executing pre-learned visuomotor skills — is a simple yet powerful way to tackle long-horizon robot tasks. But failures often arise at skill transitions: the terminal state of one skill can fall outside the initial-state distribution the next skill was trained on. Crucially, the culprit is frequently a change that is **logically irrelevant** to the next skill, yet still appears in its visual observation.
+
+Consider chaining `PlaceObject(potato, bowl)` with `MoveContainer(bowl, cabinet)`. The second policy was only ever trained on an empty bowl, so the leftover potato creates a visual mismatch that breaks it — even though moving the bowl is still perfectly feasible. We call this **Observation Space Shift (OSS)**.
+
+<TwoColumns>
+<div slot="left">
+
+### Formal definition
+
+We model the environment as a POMDP $\langle \mathcal{S}, \mathcal{O}, \mathcal{A}, \mathcal{T}, \mathcal{Z}, r, \gamma \rangle$, where the observation space $\mathcal{O}$ includes third-person camera views and proprioception. Following Task and Motion Planning, a **predicate** $\psi_i : \mathcal{S} \to \{0, 1\}$ is a binary property of the state (e.g. $\texttt{In(potato, bowl)}$), and an operator $op = \langle \textit{Pre}, \textit{Eff}, c \rangle$ specifies a skill's preconditions, effects, and cost.
+
+A predicate is **irrelevant** to an operator when $\psi_i \notin \textit{Pre} \cup \textit{Eff}$ — it does not affect feasibility. **OSS** is the problem in which changes to such irrelevant predicates in the visual observation space $\mathcal{O}$, caused by the effects of preceding skills, degrade the performance of the current visuomotor policy.
+
+</div>
+<div slot="right">
+
+### Why prior work doesn't cover it
+
+Prior skill-transition methods don't address this well. Offline transition policies assume each skill's initial states are always reachable — here that would mean **undoing** the potato placement, which is logically invalid. Online fine-tuning assumes policies can be continually retrained, which is impractical when OSS can occur at **every** transition of a long-horizon task.
+
+</div>
+</TwoColumns>
+
+## The BOSS benchmark
+
+BOSS is built on the [LIBERO](https://libero-project.github.io/) simulator — a Franka Emika Panda arm across 12 manipulation scenes. We start from **44 single-skill tasks** drawn from LIBERO-100, then generate modified counterparts with our **Rule-based Automatic Modification Generator (RAMG)**, which edits PDDL predicates — repositioning or adding objects, toggling fixtures such as opening a drawer, and changing containment relations — while preserving each skill's feasibility and logical consistency. RAMG can produce up to **1,727 single-modification variants**, giving a large, controllable testbed for OSS.
+
+<Figure>
+  <Picture slot="figure" src={challenges} alt="Diagram of the three BOSS challenges, showing a single predicate shift, accumulated predicate shifts, and a full three-skill chain." />
+  <span slot="caption">The three BOSS challenges, illustrated with the skills `OpenDrawer(cabinet, bottom)`, `PlaceObject(potato, bowl)`, and `MoveContainer(bowl, cabinet)`. Circles mark the modified — irrelevant — predicates that induce OSS.</span>
+</Figure>
+
+### Challenge 1 — Single Predicate Shift
+
+Tests robustness to a **single** irrelevant modification introduced by the immediately preceding skill, such as a potato placed in the bowl the robot must now move.
+
+### Challenge 2 — Accumulated Predicate Shift
+
+Tests the **cumulative** effect of two or three modifications from multiple preceding skills — a potato in the bowl *and* an open drawer — a harder and more realistic scenario.
+
+### Challenge 3 — Skill Chaining
+
+Evaluates **10 real long-horizon tasks**, each a chain of three skills, end to end, directly measuring how OSS degrades full-task success.
+
+## Results
+
+We evaluate four widely used imitation-learning baselines: three Behavioral Cloning policies from LIBERO (**BC-RESNET-RNN**, **BC-RESNET-T**, **BC-VIT-T**) and the vision-language-action model **OpenVLA**.
+
+For C1 and C2 we report the **Ratio Performance Delta (RPD)** — the relative drop in success rate caused by OSS. For C3 we report the **Delta to Upper Bound Ratio (DUBR)** — the normalized gap between the chain's actual success and its OSS-free upper bound. All results average over three seeds.
+
+<Figure>
+  <Picture slot="figure" src={ch1Results} alt="Four scatter plots, one per baseline, with most points falling below the diagonal." />
+  <span slot="caption">**Challenge 1.** Each point is a task pair: success rate unaffected by OSS on the x-axis, on the modified counterpart on the y-axis. Points below the diagonal are hurt by OSS; darker means larger RPD.</span>
+</Figure>
+
+**Even a single irrelevant change is damaging.** 50–68% of tasks degrade, with average performance drops of **67% / 35% / 34% / 54%** for BC-RESNET-RNN, BC-RESNET-T, BC-VIT-T and OpenVLA. BC-VIT-T fares best — attention appears to help it focus on task-relevant features — and the RNN fares worst.
+
+<Figure>
+  <Picture slot="figure" src={ch2Results} alt="Two grouped bar charts showing both the severity and the frequency of OSS rising as modifications accumulate." />
+  <span slot="caption">**Challenge 2.** Average positive RPD (top) and OSS occurrence rate (bottom), for one, two and three accumulated modifications.</span>
+</Figure>
+
+**OSS compounds.** As modifications accumulate from one to three, both severity (average RPD **0.48 → 0.59 → 0.62**) and frequency (**61.9% → 70.5% → 76.1%**) rise — exactly the regime a long-horizon task lives in.
+
+<Figure>
+  <Picture slot="figure" src={ch3Results} alt="Grouped bar chart of DUBR per long-horizon task, positive and large for nearly every task and baseline." />
+  <span slot="caption">**Challenge 3.** Delta to Upper Bound Ratio across 10 three-skill long-horizon tasks. Some BC-RESNET-RNN bars read 0% because its OSS-free upper bound is already 0% — it fails even without OSS.</span>
+</Figure>
+
+**On real long-horizon tasks the gap to the OSS-free upper bound is large and positive across nearly every task** — OSS sharply reduces end-to-end success.
+
+## Can data augmentation fix it? No.
+
+A natural idea is to expose policies to more visual variety during training. We used RAMG to generate **1,727** modified environments and replayed demonstrations to build a new dataset of **~57,000** demonstrations — nearly **30×** the original LIBERO data for these 44 tasks. We then compare **Setup A** (trained on original data) with **Setup B** (trained on the augmented data), both evaluated on the same modified C1 tasks.
+
+<Figure>
+  <Picture slot="figure" src={tableResults} alt="Table comparing success rates for the four baselines trained on original versus augmented data." />
+  <span slot="caption">Success rate under Setup A versus Setup B, and their difference A−B.</span>
+</Figure>
+
+Augmentation barely helped one baseline (BC-RESNET-RNN, +0.06) and **hurt** the others (BC-RESNET-T −0.13, BC-VIT-T −0.10, OpenVLA ±0). The combinatorial explosion of skill-induced scene variations is simply too large to cover by augmentation — even in simulation.
+
+### Other mitigations also fall short
+
+We tested two more intuitive strategies on Challenge 1, and neither resolves OSS.
+
+<TwoColumns>
+<div slot="left">
+
+**Frozen robotics-specific vision encoders.** Replacing the trainable encoder with frozen pretrained ones (R3M, LIV) still leaves **55%** (BC-R3M-T) and **61%** (BC-LIV-T) of tasks affected, with average RPD of **29%** and **26%**.
+
+</div>
+<div slot="right">
+
+**3D point-cloud policies.** Despite better viewpoint generalization, 3D Diffuser Actor still has **73%** of tasks affected, with average RPD **37%** — even image-free policies remain vulnerable to OSS.
+
+</div>
+</TwoColumns>
+
+Together with the data-augmentation result, this shows that current baselines lack any mechanism to handle OSS, motivating the need for new, OSS-targeted algorithms.
+
+## Getting started
+
+The code, the pre-trained skill policies for all three BC baselines, and the augmented dataset are all public.
+
+```shell
+git clone https://github.com/Boss-Benchmark/BOSS.git && cd BOSS
+conda env create -f environment.yml && conda activate boss
+pip install -e .
+
+huggingface-cli download yygx/BOSS-assets --repo-type dataset --local-dir libero/libero/assets
+huggingface-cli download yygx/BOSS-checkpoints --local-dir experiments/boss_44/0.0.0
+
+MUJOCO_GL=egl python libero/lifelong/eval_skill_chain.py \
+  --model_path_folder ./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/ \
+  --seed 10000 --max_steps 400 --lht 1
+```
+
+## BibTeX
+
+```bibtex
+@article{yang2025boss,
+  title={BOSS: Benchmark for observation space shift in long-horizon task},
+  author={Yang, Yue and Zhao, Linfeng and Ding, Mingyu and Bertasius, Gedas and Szafir, Daniel},
+  journal={IEEE Robotics and Automation Letters},
+  volume={10},
+  number={9},
+  pages={8882--8889},
+  year={2025},
+  publisher={IEEE}
+}
+```
+
+## Acknowledgements
+
+This work was supported in part by NSF under Award 2222953, in part by the Laboratory for Analytic Sciences via NC State University, and in part by ONR under Award N00014-23-1-2356.
