@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import { Image } from "astro:assets";
 
 type Author = {
   name: string;
@@ -21,6 +22,8 @@ type Link = {
 
 interface Props {
   title: string;
+  /** Small badge set on the title's baseline, ahead of the first word. */
+  icon?: ImageMetadata;
   subtitle?: string;
   authors: Author[];
   conference?: string;
@@ -28,7 +31,8 @@ interface Props {
   links?: Link[];
 }
 
-const { title, subtitle, authors, conference, notes, links } = Astro.props;
+const { title, icon, subtitle, authors, conference, notes, links } =
+  Astro.props;
 
 const hasBackground = Astro.slots.has("background");
 ---
@@ -57,7 +61,18 @@ const hasBackground = Astro.slots.has("background");
     ]}
   >
     <h1 class="my-0 text-4xl leading-tight font-medium tracking-tight text-balance sm:text-5xl">
-      {title}
+      {
+        icon && (
+          <Image
+            src={icon}
+            alt=""
+            width={180}
+            densities={[1, 2]}
+            loading="eager"
+            style="display:inline-block;height:1.08em;width:auto;vertical-align:-0.14em;margin:0 0.22em 0 0;max-width:none"
+          />
+        )
+      }{title}
     </h1>
     {
       subtitle && (
